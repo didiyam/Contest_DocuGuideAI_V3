@@ -1,19 +1,22 @@
 // 여러 파일 업로드 API
 export async function uploadDocuments(files: File[]) {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    files.forEach((file) => {
-        formData.append("files", file);
-    });
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
 
-    const res = await fetch("http://localhost:8000/upload", {
-        method: "POST",
-        body: formData,
-    });
-
-    if (!res.ok) {
-        throw new Error("업로드 실패 " + res.statusText);
+  const res = await fetch(
+    "https://contest-docuguideai-v3.onrender.com/upload",
+    {
+      method: "POST",
+      body: formData,
     }
+  );
 
-    return await res.json();
+  if (!res.ok) {
+    throw new Error("업로드 실패 " + res.statusText);
+  }
+
+  return await res.json();
 }
