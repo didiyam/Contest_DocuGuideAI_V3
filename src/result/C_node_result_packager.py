@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import copy
 from typing import Dict, Any
-
+from src.utils.config import load_api_keys
 from openai import OpenAI
 from src.result.C_node_action_extractor import node_action_extractor
 
@@ -11,7 +11,9 @@ from src.result.C_node_action_extractor import node_action_extractor
 
 
 def call_llm(prompt: str) -> str:
-    client = OpenAI()       
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)   
+ 
     """
     OpenAI API(Responses)를 이용해 prompt를 처리하고 결과 반환.
     - prompt: 한국어 지시가 포함된 문자열

@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Union
 import json
 from openai import OpenAI
-
+from src.utils.config import load_api_keys
 
 def node_ner_extractor(state: Dict[str, Any]) -> Dict[str, Any]:
 
@@ -99,7 +99,9 @@ def Classify_doc_type(state: Dict[str, Any]) -> Dict[str, Any]:
 - 코드 블록(````json` 등)도 사용하지 마세요.
 """.strip()
 
-    client = OpenAI()
+    
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)
 
     response = client.responses.create(
         model="gpt-4o-mini",
@@ -159,8 +161,9 @@ def Classify_doc_type(state: Dict[str, Any]) -> Dict[str, Any]:
 
 def Ner_extractor(state: Dict[str, Any]) -> Dict[str, Any]:
     
-    client = OpenAI()
-
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)
+    
     NER_SYSTEM_PROMPT = """
     당신은 한국어 공공·행정 문서를 분석하는 NER(개체명 인식) 전문가입니다.
 

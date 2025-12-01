@@ -78,10 +78,11 @@ export default function LoadingOverlay({
     console.log("[LOADING] start polling docId:", docId);
 
     const interval = setInterval(async () => {
-      const res = await fetch(
-        `https://contest-docuguideai-v3.onrender.com/progress/${docId}`
-      );
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
+      const res = await fetch(`${API_BASE}/progress/${docId}`);
       const data = await res.json();
+
       console.log("[LOADING] progress response:", data);
 
       if (currentStep >= 1) {

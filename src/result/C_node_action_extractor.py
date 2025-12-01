@@ -4,7 +4,7 @@ import json
 from typing import Dict, Any
 
 from openai import OpenAI
-
+from src.utils.config import load_api_keys
 # 전역 클라이언트 (OPENAI_API_KEY는 환경변수에서 읽음)
 
 
@@ -12,7 +12,8 @@ from openai import OpenAI
 # 1) call_llm 구현 (신버전 OpenAI)
 # -------------------------------
 def call_llm(prompt: str) -> str:
-    client = OpenAI()       
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)   
     """
     OpenAI responses API를 이용해 prompt를 처리하고 결과 반환.
     - prompt: JSON만 출력하도록 안내된 한글 프롬프트 문자열

@@ -25,9 +25,8 @@ def pdf_to_images(pdf_path: str, dpi: int = 350) -> list[str]:
 # -------------------------------
 # 텍스트 llm 정제
 # -------------------------------
-load_api_keys()
-
-client = OpenAI()
+API_KEY = load_api_keys()
+client = OpenAI(api_key=API_KEY)
 
 PROMPT ="""
 너는 공공문서 전문 정제 및 개인정보 보호 전문가다.

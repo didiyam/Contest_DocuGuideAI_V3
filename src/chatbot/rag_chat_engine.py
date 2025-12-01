@@ -7,6 +7,7 @@ RAG 기반 안전 챗봇 엔진
 """
 from src.chatbot.rag_builder import search_rag # 이진아 추가 (벡터DB 검색 모듈)
 from openai import OpenAI
+from src.utils.config import load_api_keys
 
 # "gpt-5.1-chat-latest" 써서 제출하기
 # -------------------------------
@@ -18,7 +19,8 @@ def call_llm_chat(prompt: str) -> str:
     - JSON 출력 강제 없음
     - 자연어 답변 + bullet 가능
     """
-    client = OpenAI()
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)   
 
     resp = client.chat.completions.create(
         model="gpt-4o-mini" ,
