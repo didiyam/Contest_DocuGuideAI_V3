@@ -9,7 +9,7 @@ interface FileSidebarProps {
 }
 
 export function FileSidebar({ children, className }: FileSidebarProps) {
-  const [width, setWidth] = useState(380)
+  const [width, setWidth] = useState(300)
   const isResizing = useRef(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
