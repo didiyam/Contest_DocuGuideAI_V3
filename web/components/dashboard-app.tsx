@@ -94,19 +94,17 @@ export function DashboardApp() {
   //   FastAPI /chat 호출 함수
   // ============================
   async function sendChatToBackend(docId: string, message: string) {
-    const res = await fetch(
-      "https://contest-docuguideai-v3.onrender.com/chat",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          doc_id: docId,
-          question: message,
-        }),
-      }
-    );
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        doc_id: docId,
+        question: message,
+      }),
+    });
+
 
     const data = await res.json();
     return data;
@@ -185,14 +183,14 @@ export function DashboardApp() {
     let backendAction: { title: string; text: string }[] = [];
     let backendDocId = "";
 
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+
     try {
-      const res = await fetch(
-        "https://contest-docuguideai-v3.onrender.com/process-document",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const res = await fetch(`${API_BASE}/process-document`, {
+        method: "POST",
+        body: formData,
+      });
+
 
       if (!res.ok) {
         const text = await res.text().catch(() => "");
