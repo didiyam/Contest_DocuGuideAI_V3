@@ -1,9 +1,6 @@
-# --------------------------------------------------------------
 # logger.py
 # 공통 로그 유틸리티 모듈
 # - 파일 로그 + 콘솔 로그 + (옵션) 사용자 안내 메시지 버퍼
-# --------------------------------------------------------------
-
 import logging
 import os
 from datetime import datetime
@@ -40,9 +37,7 @@ def init_logger(work_dir: str | None = None) -> logging.Logger:
     if logger.handlers:
         return logger
 
-    # ---------------------------
     # 파일 핸들러
-    # ---------------------------
     file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
     file_format = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] %(message)s",
@@ -51,9 +46,7 @@ def init_logger(work_dir: str | None = None) -> logging.Logger:
     file_handler.setFormatter(file_format)
     logger.addHandler(file_handler)
 
-    # ---------------------------
     # 콘솔 핸들러
-    # ---------------------------
     console_handler = logging.StreamHandler()
     console_format = logging.Formatter("[%(levelname)s] %(message)s")
     console_handler.setFormatter(console_format)
@@ -63,9 +56,7 @@ def init_logger(work_dir: str | None = None) -> logging.Logger:
     return logger
 
 
-# -------------------------------
 # 공용 로그 함수
-# -------------------------------
 def log(message: str, level: str = "info", logger: logging.Logger | None = None):
     """
     일반 로그용 유틸 함수
@@ -86,9 +77,7 @@ def log(message: str, level: str = "info", logger: logging.Logger | None = None)
         logger.info(message)
 
 
-# -------------------------------
 # 사용자용 안내 메시지 로그
-# -------------------------------
 def user_log(message: str, step: str | None = None):
     """
     사용자에게 보여줄 '대기 안내 메시지' 기록용 함수.

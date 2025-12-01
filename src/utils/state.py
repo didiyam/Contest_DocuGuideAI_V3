@@ -22,7 +22,7 @@ class State(TypedDict, total=False):
 
     # 결과물
     raw_txt: List[str] # ocr 직후 또는 pdf에서 추출된 raw 텍스트
-    refined_txt : List[str] # clean & llm & pll 보정된 텍스트(☑️vector DB에 저장)
+    refined_txt : List[str] # clean & llm & pll 보정된 텍스트(vector DB에 저장)
 
     #[유환 파트]
     #node_ner_extractor
@@ -41,10 +41,10 @@ class State(TypedDict, total=False):
     act_title_text : List[Dict]
 
     # 최종 패키징 산출물 
-    # ☑️vector DB에 저장 : summary, needs_action, action_info
+    # vector DB에 저장 : summary, needs_action, action_info
     db_package : Dict  #node_result_packager
     
-    # 🖥️web 출력용 : title, text (부드러운 llm 설명)
+    # web 출력용 : title, text (부드러운 llm 설명)
     web_package :  List[Dict] #node_result
 
     # chat/rag_chat_engine
