@@ -22,9 +22,7 @@ def pdf_to_images(pdf_path: str, dpi: int = 350) -> list[str]:
         doc.close()
 
     return image_paths
-# -------------------------------
 # 텍스트 llm 정제
-# -------------------------------
 API_KEY = load_api_keys()
 client = OpenAI(api_key=API_KEY)
 
@@ -94,18 +92,14 @@ def llm_clean_pii(text: str) -> str:
 
 
 
-# ⭐⚠️ 아래는 llm으로 이미지에서 바로 텍스트 추출시 사용
-# -------------------------------
+# 아래는 llm으로 이미지에서 바로 텍스트 추출시 사용
 # 이미지 → base64 변환
-# -------------------------------
 def encode_image(path: str) -> str:
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
 
-# -------------------------------
 # GPT Vision 1페이지 처리 함수
-# -------------------------------
 def extract_page_text(image_path: str) -> str:
     """
     GPT-Vision 기반 OCR + PII 마스킹을
@@ -141,9 +135,7 @@ def extract_page_text(image_path: str) -> str:
     return response.choices[0].message.content.strip()
 
 
-# -------------------------------
 # 전체 페이지 Vision 처리
-# -------------------------------
 def llm_text_from_images(image_paths: list[str]) -> list[str]:
     """
     이미지를 GPT-4o Vision에 넣고 페이지별 텍스트를 정제하여 반환하는 함수

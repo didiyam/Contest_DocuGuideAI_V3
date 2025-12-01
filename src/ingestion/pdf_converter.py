@@ -1,7 +1,5 @@
-# --------------------------------------------------------------
 # pdf_converter.py
 # 비PDF 문서를 PDF로 변환하는 표준 모듈
-# --------------------------------------------------------------
 
 
 from PIL import Image
@@ -26,10 +24,10 @@ def images_to_pdf(image_paths: list[str], output_path: str) -> str:
 
     return output_path
 
-#⭐ hwp to pdf : 잠정보류
-### LibreOffice : 웹 변환 오류 빈번하게 발생 -> 재도전 필요
-### hwp5txt : 리눅스 환경 권장(윈도우 오류남)
-### win32 : 웹 배포 시 서버에 한글파일 깔아야 함으로 불가.
+# hwp to pdf : 잠정보류
+# LibreOffice : 웹 변환 오류 빈번하게 발생 -> 재도전 필요
+# hwp5txt : 리눅스 환경 권장(윈도우 오류남)
+# win32 : 웹 배포 시 서버에 한글파일 깔아야 함으로 불가.
 # def hwp_to_pdf(input_path:str, output_path: str) -> str:
 #     #한글파일 열기 위한 함수저장
     # hwp = win32.Dispatch('HWPFrame.HwpObject')
