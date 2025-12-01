@@ -6,11 +6,10 @@ from typing import Dict, Any
 
 from openai import OpenAI
 
-from src.result.C_node_action_extractor import node_action_extractor
-from src.result.C_node_result_packager import node_result_packager, format_action_instructions
+from src.result.node_action_extractor import node_action_extractor
+from src.result.node_result_packager import node_result_packager, format_action_instructions
     
-# 서영님 버전에서 출력 없애고 
-# act_title_text을 state로 저장하는 버전입니다. (진아 수정)
+# act_title_text을 state로 저장하는 버전
 def node_result(state: Dict[str, Any]) -> Dict[str, Any]:
     # 1) 행동 추출
     state = node_action_extractor(state)
@@ -47,7 +46,7 @@ def node_result(state: Dict[str, Any]) -> Dict[str, Any]:
     return state
 
 
-# 서영님 초기 버전
+# 초기 버전
 # def node_result (state: Dict[str, Any]) -> Dict[str, Any]:
 
 #     state = node_action_extractor(state)
