@@ -27,13 +27,14 @@
 from __future__ import annotations
 
 from typing import Any, Dict, List
+from src.utils.config import load_api_keys
 
 
 
 def node_analyze_structure(state: Dict[str, Any]) -> Dict[str, Any]:
     from openai import OpenAI
-
-    client = OpenAI()
+    API_KEY = load_api_keys()
+    client = OpenAI(api_key=API_KEY)
     """
     문서 구조를 요약/정리하는 단일 노드.
 

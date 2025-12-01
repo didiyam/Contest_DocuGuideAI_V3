@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List
 import uuid
 import os
+from openai import OpenAI
 
 # -------------------------
 # Import: 문서 파이프라인 노드
@@ -38,7 +39,8 @@ def get_progress(doc_id: str):
 
 # -------------------------
 # 설정
-load_api_keys()
+API_KEY = load_api_keys()
+client = OpenAI(api_key=API_KEY)
 
 UPLOAD_DIR = "storage/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)

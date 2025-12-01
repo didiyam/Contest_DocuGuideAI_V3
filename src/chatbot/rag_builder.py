@@ -13,7 +13,9 @@ import numpy as np
 from typing import List, Dict, Any
  
 from openai import OpenAI
-client = OpenAI()
+from src.utils.config import load_api_keys
+API_KEY = load_api_keys()
+client = OpenAI(api_key=API_KEY)   
  
 # =====================================
 # 0) 경로 설정 및 DB 초기화

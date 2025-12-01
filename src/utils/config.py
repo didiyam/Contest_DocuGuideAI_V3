@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+
 # ================================
 # config.py
 # api, 설정값(경로 등) 저장
@@ -10,19 +12,13 @@ WORK_DIR = "./output/"
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # WORK_DIR = os.path.join(BASE_DIR, "output")
 
-# API KEY 파일 경로
-API_KEY_PATH = "./input/api_key.txt"
-SERPAPI_API_KEY = "./input/api_key.txt"
+load_dotenv()
 
-
-def load_api_keys(filepath=API_KEY_PATH):
-    with open(filepath, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line and "=" in line:
-                key, value = line.split("=", 1)
-                os.environ[key.strip()] = value.strip()
-
+def load_api_keys():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY가 .env 파일에 없습니다.")
+    return api_key
 
 # ================================
 # 🤖 AI Model Settings
