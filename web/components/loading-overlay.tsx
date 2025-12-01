@@ -15,7 +15,7 @@ const steps = [
     icon: ScanSearch,
     label: "OCR",
     text: "Reading document text...",
-    textKo: "문서에서 텍스트를 추출하고 있어요...",
+    textKo: "문서에서 텍스트를 추출하고 있어요...\n이미지라면 조금 더 시간이 걸릴 수 있어요",
   },
   {
     icon: FileText,

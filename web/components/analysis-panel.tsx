@@ -65,50 +65,47 @@ export function AnalysisPanel({ file }: AnalysisPanelProps) {
 
           {/* Recommended Actions */}
           <section>
-            <h3 className="text-sm font-medium text-cyan-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-              <ClipboardList className="w-4 h-4" />
-              To do List
-            </h3>
 
+            {(!file.analysis.action || !Array.isArray(file.analysis.action) || file.analysis.action.length < 2) ? (
+              <div className="p-6 text-slate-400 text-base">
+                이 문서에는 즉시 필요한 행동 안내가 포함되어 있지 않아요.<br />
+                궁금하신 부분이 있다면 똑디봇🤖이 언제든 도와드릴게요.
+              </div>
+            ) : (
+              <>
+                <h3 className="text-sm font-medium text-cyan-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <ClipboardList className="w-4 h-4" />
+                  To do List
+                </h3>
 
-            <div className="space-y-5">
+                <div className="space-y-5">
+                  {file.analysis.action.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex gap-4 items-start p-4 rounded-xl bg-slate-900/70 border border-cyan-500/10"
+                    >
+                      <div className="flex items-center justify-center 
+              h-8 w-8 rounded-full border border-cyan-400/50 
+              bg-slate-950 shadow-[0_0_12px_rgba(34,211,238,0.35)]"
+                      >
+                        <AnimatedCheck />
+                      </div>
 
-              {file.analysis.action.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex gap-4 items-start p-4 rounded-xl 
-                 bg-slate-900/70 border border-cyan-500/10
-                 sm:flex-row flex-col sm:items-start items-center"
-                >
-
-                  {/* 체크 아이콘 */}
-                  <div className="flex items-center justify-center 
-                      h-8 w-8 rounded-full border border-cyan-400/50 
-                      bg-slate-950 shadow-[0_0_12px_rgba(34,211,238,0.35)]
-                      hover:shadow-[0_0_20px_rgba(34,211,238,0.6)]
-                      hover:scale-110 transition-all duration-300">
-                    <AnimatedCheck />
-                  </div>
-
-                  {/* 텍스트 */}
-                  <div className="flex-1 sm:text-left text-center">
-                    <div className="text-base font-bold text-cyan-200 mb-1">
-                      {item.title}
+                      <div className="flex-1">
+                        <div className="text-base font-bold text-cyan-200 mb-1">
+                          {item.title}
+                        </div>
+                        <p className="text-sm text-slate-200 whitespace-pre-line leading-relaxed">
+                          {item.text}
+                        </p>
+                      </div>
                     </div>
-
-                    <p className="text-sm md:text-sm text-slate-200 whitespace-pre-line leading-relaxed">
-                      {item.text}
-                    </p>
-
-                  </div>
-
+                  ))}
                 </div>
-              ))}
-
-            </div>
+              </>
+            )}
 
           </section>
-
 
         </div>
       </div>

@@ -202,7 +202,7 @@ export function DashboardApp() {
         console.log("백엔드 응답:", data);
 
         backendDocId = data.doc_id;
-        console.log("📌 업로드 응답으로 받은 doc_id:", backendDocId);
+        console.log("업로드 응답으로 받은 doc_id:", backendDocId);
 
         backendSummary = data.summary ?? "";
         const rawAction = data.action ?? [];
@@ -210,7 +210,7 @@ export function DashboardApp() {
       }
     } catch (e) {
       console.error("ingestion API error:", e);
-      backendSummary = "⚠️ ingestion 오류 발생";
+      backendSummary = "[오류]ingestion 오류 발생";
       backendAction = [];
     } finally {
       const totalSize = incomingFiles.reduce((acc, f) => acc + f.size, 0);
