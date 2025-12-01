@@ -17,9 +17,7 @@ from src.utils.config import load_api_keys
 API_KEY = load_api_keys()
 client = OpenAI(api_key=API_KEY)   
  
-# =====================================
 # 0) 경로 설정 및 DB 초기화
-# =====================================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STORAGE_DIR = os.path.join(BASE_DIR, "storage")
 os.makedirs(STORAGE_DIR, exist_ok=True)
@@ -57,9 +55,7 @@ def init_db():
 # 모듈 로드 시 실행
 init_db()
  
-# =====================================
 # 1) OpenAI Embedding 함수
-# =====================================
 def embed_text(text: str) -> np.ndarray:
     """
     OpenAI text-embedding-3-small 사용
@@ -74,14 +70,12 @@ def embed_text(text: str) -> np.ndarray:
         )
         return np.array(response.data[0].embedding, dtype=np.float32)
     except Exception as e:
-        print("❌ Embedding Error:", e)
+        print(" Embedding Error:", e)
         # fallback: zero vector
         return np.zeros(1536, dtype=np.float32)
  
  
-# =====================================
 # 2) dict → 문장 변환
-# =====================================
 def dict_to_sentence(item: dict) -> str:
     parts = []
     if item.get("who"):
@@ -97,9 +91,7 @@ def dict_to_sentence(item: dict) -> str:
     return " / ".join(parts)
  
  
-# =====================================
 # 3) (레거시) 메모리 vector DB — 유지
-# =====================================
 vector_db: List[Dict[str, Any]] = []
  
  
@@ -120,9 +112,7 @@ def insert_actions(action_list):
     print(f"[레거시] 메모리 DB에 {len(action_list)}개 저장 완료")
  
  
-# =====================================
 # 4) 본 기능: doc_id 단위로 SQLite에 저장
-# =====================================
 def insert_info(doc_id: str, action_info: list, refined_txt: List[str]):
     """
     RAG 저장 함수: 행동(action) + 페이지 텍스트(refined_txt)
@@ -187,12 +177,10 @@ def insert_info(doc_id: str, action_info: list, refined_txt: List[str]):
  
         conn.commit()
  
-    print(f"📌 [SQLite] doc_id={doc_id} → {inserted}개 항목 저장 완료")
+    print(f" [SQLite] doc_id={doc_id} → {inserted}개 항목 저장 완료")
  
  
-# =====================================
 # 5) (레거시) in-memory 검색
-# =====================================
 def search_actions(query: str, top_k: int = 3):
     """테스트용 in-memory vector DB 검색"""
     if not vector_db:
@@ -209,9 +197,7 @@ def search_actions(query: str, top_k: int = 3):
     return [item for score, item in scores[:top_k]]
  
  
-# =====================================
 # 6) SQLite 기반 RAG 검색
-# =====================================
 def search_rag(doc_id: str, query: str, top_k: int = 5):
     """
     문서 단위 RAG 검색
@@ -233,7 +219,7 @@ def search_rag(doc_id: str, query: str, top_k: int = 5):
         rows = cur.fetchall()
  
     if not rows:
-        print(f"⚠️ doc_id={doc_id} 데이터 없음")
+        print(f"!! doc_id={doc_id} 데이터 없음")
         return []
  
     def cosine(a, b):
@@ -261,9 +247,7 @@ def search_rag(doc_id: str, query: str, top_k: int = 5):
     return [item for score, item in scored_items[:top_k]]
  
  
-# =====================================
 # 7) 간단 답변 생성 예시
-# =====================================
 def generate_answer(user_query: str):
     """레거시 in-memory 검색 예시"""
     items = search_actions(user_query)

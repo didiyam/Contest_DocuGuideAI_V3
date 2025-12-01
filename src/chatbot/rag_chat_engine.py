@@ -1,19 +1,15 @@
-"""
-RAG 기반 안전 챗봇 엔진
-- 사용자의 질문을 받아 벡터DB 검색 수행
-- 검색된 근거 기반으로 LLM 답변 생성
-- 답변 기록(state) 관리 (최대 3개 슬롯)
-- 초과 시 자동 요약 저장
-"""
-from src.chatbot.rag_builder import search_rag, embed_text # 이진아 추가 (벡터DB 검색 모듈)
+#RAG 기반 안전 챗봇 엔진
+#- 사용자의 질문을 받아 벡터DB 검색 수행
+#- 검색된 근거 기반으로 LLM 답변 생성
+#- 답변 기록(state) 관리 (최대 3개 슬롯)
+#- 초과 시 자동 요약 저장
+
+from src.chatbot.rag_builder import search_rag, embed_text 
 from openai import OpenAI
 from src.utils.config import load_api_keys
 
 
-# "gpt-5.1-chat-latest" 써서 제출하기
-# -------------------------------
 # call_llm_chat 구현 (문서 기반 챗봇)
-# -------------------------------
 def call_llm_chat(prompt: str) -> str:
     """
     문서 기반 챗봇 응답 생성용 LLM 호출 함수
@@ -42,9 +38,8 @@ def call_llm_chat(prompt: str) -> str:
     )
 
     return resp.choices[0].message.content.strip()
-# ------------------------------
+
 # 1) state 구조 정의
-# ------------------------------
 state = {
     "history": [],       # [{"question": str, "answer": str}]
     "summary": "",        # 오래된 기록 요약 저장
@@ -52,9 +47,7 @@ state = {
 }
 
 
-# ------------------------------
 # 2) 오래된 기록 요약하는 함수
-# ------------------------------
 def summarize_history(history_list, existing_summary=""):
     """
     질문·답변 기록(history)을 요약하는 함수
@@ -74,7 +67,8 @@ def summarize_history(history_list, existing_summary=""):
     """
 
     return call_llm_chat(prompt).strip()
-# -----------------------------------------------------------------------------------
+
+
 import re
 import numpy as np
 
@@ -108,9 +102,7 @@ def find_best_sentence(query: str, chunk_text: str):
 
     return best_sent
 
-# ------------------------------
 # 3) RAG 기반 답변 생성 함수 (문장 기반 근거추출 완전통합 버전)
-# ------------------------------
 def generate_response(doc_id: str, user_query: str) -> dict:
     """
     문서 단위(doc_id) 기반 RAG 검색 → 답변 생성 → state 업데이트
@@ -132,7 +124,7 @@ def generate_response(doc_id: str, user_query: str) -> dict:
             "state": state
         }
 
-    # 🔥 1-1) 출처용 후보 = page 텍스트만 필터링 (action 제외)
+    #  1-1) 출처용 후보 = page 텍스트만 필터링 (action 제외)
     page_items = [item for item in retrieved_items if item.get("type") == "page"]
 
     # 만약 page가 검색 안 됐다면 fallback (현실적으로 거의 없음)
@@ -188,12 +180,10 @@ def generate_response(doc_id: str, user_query: str) -> dict:
     answer = call_llm_chat(prompt).strip()
 
 
-    # =====================================================
-    # 6) 🔥 문서 출처 문장 기반 추출 (action 제외)
-    # =====================================================
+    # 6)  문서 출처 문장 기반 추출 (action 제외)
     best_sentences = []
 
-    for item in page_items:     # 🔥 refined_txt에서만 뽑는다
+    for item in page_items:     #  refined_txt에서만 뽑는다
         page_text = item.get("text", "")
         best_sentence = find_best_sentence(user_query, page_text)
 
@@ -208,9 +198,7 @@ def generate_response(doc_id: str, user_query: str) -> dict:
     real_source = "\n".join(best_sentences)
 
 
-    # =====================================================
     # 7) state 업데이트
-    # =====================================================
     state["present_answer"] = answer
     state["history"].append({"question": user_query, "answer": answer})
 
@@ -225,9 +213,7 @@ def generate_response(doc_id: str, user_query: str) -> dict:
         "source": real_source,
         "state": state
     }
-# # ------------------------------
 # # 3) RAG 기반 답변 생성 함수 (이진아 수정 : doc_id 기반)
-# # ------------------------------
 # def generate_response(doc_id: str, user_query: str) -> dict:
 #     """
 #     문서 단위(doc_id) 기반 RAG 검색 → 답변 생성 → state 업데이트
@@ -304,7 +290,6 @@ def generate_response(doc_id: str, user_query: str) -> dict:
 #     answer = call_llm_chat(prompt).strip()
     
 #     # 실제 사용된 문장만 근거로 추출
-#     # --------------------------
 #     used_sources = []
 
 #     for item in retrieved_items:
