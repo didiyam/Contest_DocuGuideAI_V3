@@ -239,7 +239,7 @@ export function WelcomeScreen({ onStartUpload }: WelcomeScreenProps) {
       </div>
 
       <div className="absolute bottom-6 text-slate-600 text-xs">
-        v1.0.0 • Powered by AI Analysis
+        KEIT 2025 AI Challenge 참가작 &copy; DocuGuide AI 똑디Doc
       </div>
     </div>
   )
