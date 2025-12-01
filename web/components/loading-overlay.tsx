@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ScanSearch, FileText, Bot, BarChart, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ScanSearch, FileText, Bot, BarChart, CheckCircle } from "lucide-react"
 
 interface LoadingOverlayProps {
-  fileName?: string;
-  visible: boolean;
-  docId: string;
+  fileName?: string
+  visible: boolean
+  docId: string
 }
 
 const steps = [
@@ -35,92 +35,86 @@ const steps = [
     text: "Complete!",
     textKo: "완료되었습니다!",
   },
-];
+]
 
-export default function LoadingOverlay({
-  fileName,
-  visible,
-  docId,
-}: LoadingOverlayProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(true);
+export default function LoadingOverlay({ fileName, visible, docId }: LoadingOverlayProps) {
+  const [currentStep, setCurrentStep] = useState(0)
+  const [displayedText, setDisplayedText] = useState("")
+  const [isTyping, setIsTyping] = useState(true)
 
-  /** OCR 10초 유지 후 Refine 단계로 이동 */
+  //단계 바뀔 때마다 타이핑 리셋
   useEffect(() => {
-    if (!visible) return;
-    setCurrentStep(0);
+    setDisplayedText("")
+    setIsTyping(true)
+  }, [currentStep])
 
-    const timer = setTimeout(() => {
-      setCurrentStep(1); // Refine 단계로 이동
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, [visible]);
-
-  useEffect(() => {
-    setDisplayedText("");
-    setIsTyping(true);
-  }, [currentStep]);
-
-  /** visible이 true일 때만 로직 실행 */
+  // visible false → 초기화
   useEffect(() => {
     if (!visible) {
-      setCurrentStep(0);
-      setDisplayedText("");
-      return;
+      setCurrentStep(0)
+      setDisplayedText("")
     }
-  }, [visible]);
+  }, [visible])
 
-  /** 타이핑 효과 */
+
+  // ⭐ 핵심 변경됨: progress polling (백엔드 단계 100% 따라가기)
   useEffect(() => {
     if (!visible || !docId) return;
-    console.log("[LOADING] start polling docId:", docId);
+
+    console.log("[LOADING] start polling:", docId)
 
     const interval = setInterval(async () => {
-      const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+      const res = await fetch(`http://127.0.0.1:8000/progress/${docId}`)
+      const data = await res.json()
 
-      const res = await fetch(`${API_BASE}/progress/${docId}`);
-      const data = await res.json();
+      console.log("[LOADING] progress:", data)
 
-      console.log("[LOADING] progress response:", data);
-
-      if (currentStep >= 1) {
-        if (data.step === "analysis") setCurrentStep(2);
-        if (data.step === "summary") setCurrentStep(3);
+      // ⭐ 추가됨: 백엔드 단계 매핑
+      const stepMap: Record<string, number> = {
+        ocr: 0,
+        refine: 1,
+        analysis: 2,
+        summary: 3,
       }
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, [visible, docId, currentStep]);
+      const next = stepMap[data.step]
 
-  /** 완료 후 3초 뒤에 사라지기 */
+      if (typeof next === "number" && next !== currentStep) {
+        setCurrentStep(next)
+      }
 
+    }, 300) // 0.3초 polling
+
+    return () => clearInterval(interval)
+  }, [visible, docId, currentStep])
+
+  // ⭐ 유지됨: 마지막 단계 시 3초 유지 후 종료 가능
   useEffect(() => {
     if (currentStep === 3) {
       const t = setTimeout(() => {
-        // 부모에서 visible=false 설정하는 콜백
-      }, 3000);
-      return () => clearTimeout(t);
+        // 부모가 visible=false로 닫기
+      }, 3000)
+      return () => clearTimeout(t)
     }
-  }, [currentStep]);
+  }, [currentStep])
+
 
   /** 타이핑 효과 (변경 없음) */
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) return
 
-    const currentText = steps[currentStep].text;
+    const currentText = steps[currentStep].text
     if (displayedText.length < currentText.length) {
       const timer = setTimeout(() => {
-        setDisplayedText(currentText.slice(0, displayedText.length + 1));
-      }, 35);
-      return () => clearTimeout(timer);
+        setDisplayedText(currentText.slice(0, displayedText.length + 1))
+      }, 35)
+      return () => clearTimeout(timer)
     } else {
-      setIsTyping(false);
+      setIsTyping(false)
     }
-  }, [displayedText, currentStep, visible]);
+  }, [displayedText, currentStep, visible])
 
-  if (!visible) return null;
+  if (!visible) return null
 
   return (
     <div className="fixed inset-0 z-[99999] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-8">
@@ -139,10 +133,7 @@ export default function LoadingOverlay({
                   rotate: currentStep === 1 ? [0, -1, 1, -1, 0] : 0,
                 }}
                 transition={{
-                  rotate: {
-                    repeat: currentStep === 1 ? Number.POSITIVE_INFINITY : 0,
-                    duration: 0.5,
-                  },
+                  rotate: { repeat: currentStep === 1 ? Number.POSITIVE_INFINITY : 0, duration: 0.5 },
                 }}
                 exit={{ opacity: 0, scale: 0.8 }}
               >
@@ -156,19 +147,6 @@ export default function LoadingOverlay({
                   <div className="w-4/5 h-3 bg-slate-700 rounded" />
                 </div>
 
-                {/* 파일명 표시 (실제 업로드한 파일명 그대로) */}
-                {fileName && (
-                  <div className="absolute -bottom-17 left-0 right-0 text-center px-4">
-                    <p
-                      className="
-                                                text-slate-400 text-sm font-medium opacity-80
-                                                whitespace-nowrap         "
-                    >
-                      {fileName}
-                    </p>
-                  </div>
-                )}
-
                 {/* OCR 스캔 애니메이션 */}
                 {currentStep === 0 && (
                   <>
@@ -181,19 +159,12 @@ export default function LoadingOverlay({
                           "0 0 20px rgba(59, 130, 246, 0.5)",
                         ],
                       }}
-                      transition={{
-                        repeat: Number.POSITIVE_INFINITY,
-                        duration: 2,
-                      }}
+                      transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
                     />
                     <motion.div
                       className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"
                       animate={{ top: ["0%", "100%"] }}
-                      transition={{
-                        repeat: Number.POSITIVE_INFINITY,
-                        duration: 2,
-                        ease: "linear",
-                      }}
+                      transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, ease: "linear" }}
                     />
                   </>
                 )}
@@ -209,10 +180,7 @@ export default function LoadingOverlay({
                         "0 0 30px rgba(168, 85, 247, 0.4)",
                       ],
                     }}
-                    transition={{
-                      repeat: Number.POSITIVE_INFINITY,
-                      duration: 1.5,
-                    }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
                   />
                 )}
 
@@ -256,24 +224,50 @@ export default function LoadingOverlay({
                   }}
                   transition={{ duration: 0.6 }}
                 >
-                  <CheckCircle
-                    className="w-32 h-32 text-emerald-400"
-                    strokeWidth={1.5}
-                  />
+                  <CheckCircle className="w-32 h-32 text-emerald-400" strokeWidth={1.5} />
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
+        <div className="flex flex-col items-center mb-16">
+
+          {/* 문서 아이콘 */}
+          <AnimatePresence mode="wait">
+            ... (기존 document motion 코드 그대로)
+          </AnimatePresence>
+
+          {/* 파일명 (큰 아이콘 아래로 이동) */}
+          {fileName && (
+            <p
+              className="
+                mt-4 
+                max-w-[280px]
+                text-center
+                text-slate-300 
+                text-sm 
+                font-medium 
+                opacity-80
+                whitespace-nowrap 
+                overflow-hidden 
+                text-ellipsis
+            "
+            >
+              {fileName}
+            </p>
+          )}
+        </div>
+
+
         {/* 하단 스텝 표시 */}
         <div className="relative mt-24">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === currentStep;
-              const isCompleted = index < currentStep;
-              const isPending = index > currentStep;
+              const Icon = step.icon
+              const isActive = index === currentStep
+              const isCompleted = index < currentStep
+              const isPending = index > currentStep
 
               return (
                 <div key={index} className="flex-1 relative">
@@ -284,35 +278,25 @@ export default function LoadingOverlay({
                         scale: isActive ? 1.2 : 1,
                         boxShadow: isActive
                           ? [
-                              "0 0 20px rgba(255, 255, 255, 0.4)",
-                              "0 0 40px rgba(255, 255, 255, 0.6)",
-                              "0 0 20px rgba(255, 255, 255, 0.4)",
-                            ]
+                            "0 0 20px rgba(255, 255, 255, 0.4)",
+                            "0 0 40px rgba(255, 255, 255, 0.6)",
+                            "0 0 20px rgba(255, 255, 255, 0.4)",
+                          ]
                           : "none",
                       }}
                       transition={{
                         scale: { duration: 0.3 },
-                        boxShadow: {
-                          repeat: isActive ? Number.POSITIVE_INFINITY : 0,
-                          duration: 2,
-                        },
+                        boxShadow: { repeat: isActive ? Number.POSITIVE_INFINITY : 0, duration: 2 },
                       }}
                     >
                       <Icon
-                        className={`w-8 h-8 text-white ${
-                          isPending ? "opacity-50" : ""
-                        }`}
+                        className={`w-8 h-8 text-white ${isPending ? "opacity-50" : ""}`}
                       />
                     </motion.div>
 
                     <p
-                      className={`mt-3 text-sm font-medium ${
-                        isActive
-                          ? "text-white"
-                          : isPending
-                          ? "text-slate-600"
-                          : "text-slate-400"
-                      }`}
+                      className={`mt-3 text-sm font-medium ${isActive ? "text-white" : isPending ? "text-slate-600" : "text-slate-400"
+                        }`}
                     >
                       {step.label}
                     </p>
@@ -322,9 +306,8 @@ export default function LoadingOverlay({
                   {index < steps.length - 1 && (
                     <div className="absolute top-8 left-[calc(50%+3rem)] right-[calc(-50%+3rem)] h-0.5">
                       <motion.div
-                        className={`h-full ${
-                          index < currentStep ? "bg-white" : "bg-slate-700"
-                        }`}
+                        className={`h-full ${index < currentStep ? "bg-white" : "bg-slate-700"
+                          }`}
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: index < currentStep ? 1 : 0 }}
                         transition={{ duration: 0.5 }}
@@ -333,7 +316,7 @@ export default function LoadingOverlay({
                     </div>
                   )}
                 </div>
-              );
+              )
             })}
           </div>
 
@@ -351,10 +334,7 @@ export default function LoadingOverlay({
                 {isTyping && (
                   <motion.span
                     animate={{ opacity: [1, 0, 1] }}
-                    transition={{
-                      repeat: Number.POSITIVE_INFINITY,
-                      duration: 0.8,
-                    }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.8 }}
                     className="text-violet-400"
                   >
                     |
@@ -378,5 +358,5 @@ export default function LoadingOverlay({
         </div>
       </div>
     </div>
-  );
+  )
 }
