@@ -1,0 +1,21 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/src"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}",
+        "${workspaceFolder}/src"
+    ],
+    "python.testing.cwd": "${workspaceFolder}",
+    "css.customData": [
+        "./tailwind.custom-data.json"
+    ],
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "editor.inlineSuggest.enabled": true,
+    "css.lint.unknownAtRules": "ignore",
+    "scss.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore"
+}

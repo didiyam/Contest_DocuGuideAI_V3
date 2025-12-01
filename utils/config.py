@@ -1,0 +1,58 @@
+import os
+# ================================
+# config.py
+# api, 설정값(경로 등) 저장
+# ================================
+
+# 프로젝트 기본 폴더 기준 (src 기준)
+WORK_DIR = "./output/"
+# # MEDIA_DIR = "./output/"
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# WORK_DIR = os.path.join(BASE_DIR, "output")
+
+# API KEY 파일 경로
+API_KEY_PATH = "./input/api_key.txt"
+SERPAPI_API_KEY = "./input/api_key.txt"
+
+
+def load_api_keys(filepath=API_KEY_PATH):
+    with open(filepath, "r") as f:
+        for line in f:
+            line = line.strip()
+            if line and "=" in line:
+                key, value = line.split("=", 1)
+                os.environ[key.strip()] = value.strip()
+
+
+# ================================
+# 🤖 AI Model Settings
+# ================================
+
+# # LLM 모델 이름
+LLM_MODEL = "gpt-4o-mini"
+
+# ================================
+# 💬 User Prompt Default
+# ================================
+
+# DEFAULT_USER_PROMPT = {
+#     "voice": DEFAULT_VOICE,
+#     "tone": "친절하고 명료한 강의 톤",
+#     "style": "예시와 핵심 요점 중심",
+#     "lang": "한국어",
+#     "target": "대학생",
+# }
+
+# ================================
+# 🎬 Video / Audio Settings
+# ================================
+
+# VIDEO_WIDTH = 1920
+# VIDEO_HEIGHT = 1080
+# AUDIO_BITRATE = "192k"
+
+# ================================
+# ⚙ App Settings
+# ================================
+
+RECURSION_LIMIT = 200

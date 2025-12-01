@@ -1,0 +1,13 @@
+{
+    "atDirectives": [
+        {
+            "name": "@custom-variant"
+        },
+        {
+            "name": "@theme"
+        },
+        {
+            "name": "@apply"
+        }
+    ]
+}
