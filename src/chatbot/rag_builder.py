@@ -1,7 +1,7 @@
 """
 Windows용 안전 챗봇 RAG (SQLite 영구 저장)
 SentenceTransformer 제거 버전
-→ OpenAI Embedding(text-embedding-3-small) 사용
+OpenAI Embedding(text-embedding-3-small) 사용
 """
  
 import os
