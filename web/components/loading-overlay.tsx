@@ -49,7 +49,7 @@ export default function LoadingOverlay({ fileName, visible, docId }: LoadingOver
 
     const interval = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % steps.length);
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [visible]);
@@ -70,7 +70,7 @@ export default function LoadingOverlay({ fileName, visible, docId }: LoadingOver
   }, [visible])
 
 
-  /** 타이핑 효과 (변경 없음) */
+  /** 타이핑 효과 */
   useEffect(() => {
     if (!visible) return
 
@@ -78,7 +78,7 @@ export default function LoadingOverlay({ fileName, visible, docId }: LoadingOver
     if (displayedText.length < currentText.length) {
       const timer = setTimeout(() => {
         setDisplayedText(currentText.slice(0, displayedText.length + 1))
-      }, 35)
+      }, 50)
       return () => clearTimeout(timer)
     } else {
       setIsTyping(false)
