@@ -70,7 +70,7 @@ async def process_document(
         saved_paths.append(save_path)
 
     # 2) ingestion 실행
-    set_progress(doc_id, "ocr")    # 단계 1 시작
+    # set_progress(doc_id, "ocr")    # 단계 1 시작
 
     state = {"input_paths": saved_paths}
 
@@ -78,17 +78,17 @@ async def process_document(
     state = await run_in_threadpool(node_ingestion_pipeline, state)
 
     refined_txt = state["refined_txt"]
-    state["refined_text"] = refined_txt  # 유지
+    state["refined_text"] = refined_txt
 
 
     # 3) NER 실행
-    set_progress(doc_id, "refine")   # 단계 2 시작
+    # set_progress(doc_id, "refine")   # 단계 2 시작
 
     state = await run_in_threadpool(node_ner_extractor, state)
 
 
     # 4) result packager 실행
-    set_progress(doc_id, "analysis")  # 단계 3 시작
+    # set_progress(doc_id, "analysis")  # 단계 3 시작
 
     state = await run_in_threadpool(node_result, state)
 
@@ -98,7 +98,7 @@ async def process_document(
     summary = state["summary"]
 
     # 마지막 단계
-    set_progress(doc_id, "summary")   # 단계 4
+    # set_progress(doc_id, "summary")   # 단계 4
     
     # 5) RAG 벡터DB 저장 : DB 저장도 thread로 분리 (blocking 방지)
     await run_in_threadpool(insert_info, doc_id, action_info, refined_txt)
@@ -139,8 +139,8 @@ async def chat(req: ChatRequest):
     )
 
 
-#  3. /progress/{doc_id}  (진행상황 조회)
-@app.get("/progress/{doc_id}")
-async def progress(doc_id: str):
-    print(">>> PROGRESS GET:", doc_id, "stored:", progress_store.get(doc_id))
-    return {"step": get_progress(doc_id)}
+# #  3. /progress/{doc_id}  (진행상황 조회)
+# @app.get("/progress/{doc_id}")
+# async def progress(doc_id: str):
+#     print(">>> PROGRESS GET:", doc_id, "stored:", progress_store.get(doc_id))
+#     return {"step": get_progress(doc_id)}
