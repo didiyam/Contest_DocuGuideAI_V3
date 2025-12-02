@@ -155,7 +155,7 @@ export function DashboardApp() {
   const uploadFiles = async (incomingFiles: File[]) => {
     if (incomingFiles.length === 0) return;
 
-    console.log("✅ uploadFiles 호출됨, files:", incomingFiles);
+    console.log("uploadFiles 호출됨, files:", incomingFiles);
 
     setIsUploading(true);
 
@@ -253,7 +253,7 @@ export function DashboardApp() {
 
   const handleWelcomeStart = (filesToUpload: File[]) => {
     if (filesToUpload.length === 0) return;
-    console.log("✅ handleWelcomeStart 호출됨, files:", filesToUpload);
+    console.log("handleWelcomeStart 호출됨, files:", filesToUpload);
     uploadFiles(filesToUpload);
   };
 
@@ -275,7 +275,7 @@ export function DashboardApp() {
           isUploading={isUploading}
         />
       ) : (
-          <div className="min-h-screen w-full bg-slate-950 text-slate-200 flex flex-col overflow-y-auto">
+          <div className="h-screen w-full bg-slate-950 text-slate-200 flex flex-col">
           <UploadModal
             isOpen={uploadModalOpen}
             onClose={() => setUploadModalOpen(false)}
@@ -284,7 +284,7 @@ export function DashboardApp() {
           />
 
           {/* Mobile */}
-          <div className="lg:hidden flex-1 flex flex-col relative overflow-hidden">
+          <div className="lg:hidden flex-1 flex flex-col relative overflow-y-auto touch-pan-y">
             {mobileView === "list" ? (
               <SidebarFileList
                 files={files}
@@ -334,7 +334,7 @@ export function DashboardApp() {
                 >
                     <SheetContent
                       side="bottom"
-                      className="h-screen p-0 rounded-t-2xl"
+                      className="h-screen p-0 rounded-t-2xl overflow-y-auto"
                     >
 
                     <ChatInterface

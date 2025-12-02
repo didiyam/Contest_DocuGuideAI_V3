@@ -13,9 +13,8 @@ export function AnalysisPanel({ file }: AnalysisPanelProps) {
   if (!file.analysis) return null
 
   return (
-    <div className="h-full flex flex-col animate-in fade-in duration-300 bg-slate-950">
-      {/* Scrollable Content */}
-      <div className="flex-1 ScrollArea custom-scrollbar">
+    <div className="flex flex-col bg-slate-950 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto ScrollArea custom-scrollbar">
 
         {/* File Header */}
         <div className="px-6 py-2 border-b border-cyan-500/10 bg-slate-900/30">
