@@ -15,7 +15,7 @@ const steps = [
     icon: ScanSearch,
     label: "OCR",
     text: "Reading document text...",
-    textKo: "문서에서 텍스트를 추출하고 있어요...",
+    textKo: "문서에서 텍스트를 추출하고 있어요...\n이미지라면 조금 더 시간이 걸릴 수 있어요",
   },
   {
     icon: FileText,
@@ -33,7 +33,7 @@ const steps = [
     icon: BarChart,
     label: "Summary",
     text: "Complete!",
-    textKo: "완료되었습니다!",
+    textKo: "분석이 완료되었습니다! 챗봇 생성 완료 후 바로 결과를 보여드릴게요 ",
   },
 ]
 

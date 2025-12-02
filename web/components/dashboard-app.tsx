@@ -31,7 +31,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
         <Sparkles className="w-12 h-12 text-cyan-400 animate-pulse" />
       </div>
       <h1 className="text-2xl font-bold text-cyan-100">똑디 Doc!</h1>
-      <p className="text-cyan-400/70 mt-2">Intelligent Document Analysis</p>
+      <p className="text-cyan-400/70 mt-2">당신의 똑똑한 디지털 문서 매니저</p>
     </div>
   );
 };
@@ -202,7 +202,7 @@ export function DashboardApp() {
         console.log("백엔드 응답:", data);
 
         backendDocId = data.doc_id;
-        console.log("📌 업로드 응답으로 받은 doc_id:", backendDocId);
+        console.log("업로드 응답으로 받은 doc_id:", backendDocId);
 
         backendSummary = data.summary ?? "";
         const rawAction = data.action ?? [];
@@ -210,7 +210,7 @@ export function DashboardApp() {
       }
     } catch (e) {
       console.error("ingestion API error:", e);
-      backendSummary = "⚠️ ingestion 오류 발생";
+      backendSummary = "[오류]ingestion 오류 발생";
       backendAction = [];
     } finally {
       const totalSize = incomingFiles.reduce((acc, f) => acc + f.size, 0);

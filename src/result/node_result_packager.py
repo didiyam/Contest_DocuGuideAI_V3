@@ -6,90 +6,62 @@ from typing import Dict, Any
 from src.utils.config import load_api_keys
 from openai import OpenAI
 from src.result.node_action_extractor import node_action_extractor
-API_KEY = load_api_keys()
-client = OpenAI(api_key=API_KEY)
 
 # 요약용 LLM
-def call_llm_summary(prompt: str) -> str:
-    API_KEY = load_api_keys()
-    client = OpenAI(api_key=API_KEY)
-
-    resp = client.responses.create(
-        model="gpt-4o-mini",
-        input=[
-            {"role": "system", "content": "당신은 공공문서를 간결하고 가독성 좋게 요약하는 한국어 요약 전문가입니다."},
-            {"role": "user", "content": prompt},
-        ],
-    )
-
-    # 안전하게 parse
-    try:
-        output = resp.output
-        if not output:
-            return "[실패] 요약 생성에 실패했습니다."
-
-        content = output[0].content
-        if not content:
-            return "[실패] 요약 생성에 실패했습니다."
-
-        if not hasattr(content[0], "text"):
-            return "[실패] 요약 생성에 실패했습니다."
-
-        return content[0].text.strip()
-
-    except Exception as e:
-        print("[LLM SUMMARY ERROR]", e)
-        return "[오류] 요약 생성 중 오류가 발생했습니다."
-
-
-# 행동 안내용 LLM
 def call_llm(prompt: str) -> str:
     API_KEY = load_api_keys()
-    client = OpenAI(api_key=API_KEY)
+    client = OpenAI(api_key=API_KEY)  
     """
     OpenAI API(Responses)를 이용해 prompt를 처리하고 결과 반환.
     - prompt: 한국어 지시가 포함된 문자열
     - 반환: 모델이 생성한 문자열
     """
     resp = client.responses.create(
-        model="gpt-5.1-chat-latest",
+        model="gpt-4o-mini",
         input=[
             {
                 "role": "system",
-                "content": "당신은 사용자가 해야하는 공공문서의 행동지시를 부드럽고 자연스럽게 안내문으로 재작성하는 어시스턴트입니다."
-                ,
+                "content": (
+                    "당신은 한국어 공공문서 요약 및 안내문 재작성 어시스턴트입니다. "
+                    "사용자의 지시를 따라 요약 또는 자연어 설명을 생성하되, "
+                    "불필요한 설명은 붙이지 마세요."
+                ),
             },
             {
                 "role": "user",
                 "content": prompt,
             },
         ],
+        temperature=0.2,
     )
-    # 최신 Responses API의 표준 출력
+
+    # 1) output_text 사용
     if hasattr(resp, "output_text") and resp.output_text:
         return resp.output_text.strip()
 
-    # 일부 모델 : output이 리스트 형태
+    # 2) output(list) 처리
     if hasattr(resp, "output") and resp.output:
-        parts = resp.output
         texts = []
-        for p in parts:
-            if p.type == "output_text":
-                texts.append(p.text)
-            elif hasattr(p, "content"):
-                for c in p.content:
-                    if hasattr(c, "text"):
+        for item in resp.output:
+            if getattr(item, "type", "") == "output_text":
+                if getattr(item, "text", None):
+                    texts.append(item.text)
+
+            if getattr(item, "content", None):
+                for c in item.content:
+                    if getattr(c, "text", None):
                         texts.append(c.text)
-        return "\n".join(texts).strip()
+
+        if texts:
+            return "\n".join(texts).strip()
+
+    # 3) fallback
     return str(resp).strip()
-
-
-
+    
 
 
 # -------------------------
-# _summarizer 
-# -------------------------
+# 요약 함수
 def _summarizer(text: str) -> str:
     prompt = f"""
 아래 문서의 핵심 내용을 5~8문장이내로 요약하라. 
@@ -106,10 +78,9 @@ def _summarizer(text: str) -> str:
 
 반드시 한국어 문장형 요약만 출력하고 JSON을 포함하지 말 것.
 """
-    return call_llm_summary(prompt)
+    return call_llm(prompt)
 
-
-# node_result_packager
+# 행동 추출 및 요약 패키저
 # -------------------------
 def node_result_packager(state: Dict[str, Any]) -> Dict[str, Any]:
     print("\n[Node] node_result_packager 실행")
@@ -160,46 +131,49 @@ def format_action_instructions(action_list):
         where = item.get("where", "")
 
         prompt = f"""
-        아래 정보를 이용해 사용자가 해야 할 행동을 자연스럽게 설명하는 문장으로 만들어 주세요.
-        출력 형식은 자연스러운 한국어 문장만 포함하며, 리스트 기호(•, -, 숫자 등)는 절대 사용하지 않습니다.
+아래 정보를 기반으로 자연스럽고 가독성 좋게 여러 문장으로 행동 설명 문장을 만들어줘.
+- title은 단 한 번만 출력할 것.
+- "제목:" 같은 라벨은 절대 생성하지 말 것.
+- 설명 문장 안에 title을 반복해서 쓰지 말 것.
+- title은 반드시 **명사구로만** 작성해야 함.
+- title은 절대 "~하다", "~하기", "~하는 것" 등 동사/동명사로 끝나면 안 됨.
+- title은 반드시 **구체적**이고 명확해야 함.
+  예: “세금 납부”처럼 추상적 표현 금지.  
+      “주민세 납부”, “재산세 납부”처럼 실제 항목에 맞게 구체적으로 작성할 것.
+- title이 여러 개일 경우 **서로 완전히 동일하거나 동일 의미를 갖는 표현을 금지함.**
+  즉, 각 title은 개별 항목을 정확히 구분할 수 있도록 차별화된 명사구여야 함.
 
-        [작성 규칙 — 반드시 모두 지킬 것]
+- 말투는 부드럽게
+- 명령조가 아닌 지시하고 안내하는 방식으로 쓸 것. 예를 들어, "~OO하세요"와 같은 화법으로 쓸것
+- 문장이 너무 길면 2~3문장으로 나눠줘
+- 불필요한 형식적 문구는 빼줘
+- 결과는 문장만 반환 (•, -, 리스트 문법 없이)
+- 담당 기관이 뒷부분과 동일하면 앞부분에서 한 번만 안내할 것
+- 행위를 위해 가야하는 곳이 아니라면 where은 생략할 것.
+- **은행계좌(bank_account)의 경우 은행 명도 같이 표기할 것**  
+- 단, 은행계좌가 3개 이상인 경우, 대표로 2개만 노출하고 "더 많은 계좌번호는 챗봇을 통해 문의해주세요"와 같이 쓸 것
 
-        1) 문체 및 구성
-        - 말투는 부드럽고 안내하듯이 작성하세요. (“~하세요” 형태 권장)
-        - 문장이 너무 길면 2~3개의 짧은 문장으로 나누세요.
-        - 불필요한 형식적 문구, 반복 표현, 장황한 설명은 넣지 않습니다.
 
-        2) 제목(title) 관련 규칙
-        - title은 결과 문단에서 **절대 반복해서 쓰지 않습니다.** (한 번도 쓰지 말 것)
-        - “제목:”, “[제목]” 같은 라벨도 쓰지 않습니다.
-        - title은 동사형(~하다, ~하기)으로 쓰지 않습니다. **반드시 명사구 형태**로만 사용하십시오.
-        - 여러 행동이 있을 경우, 각 title은 서로 명확히 구분될 수 있도록 실제 행동명을 구체적으로 표현해야 합니다.  
-        (예: “세금 납부” 금지 → “주민세 납부”, “재산세 납부”처럼 구체적 명칭)
+[행동명(title)] : "text"에서는 절대 반복 금지.
+"{title}"
 
-        3) 정보 사용 규칙
-        - where(장소/기관)이 '방문해야 하는 장소'가 아닌 단순 출처 정보라면 생략하세요.
-        - 담당 기관이 문단 내에서 반복될 경우, 앞에서 한 번만 언급하고 이후에는 반복하지 마세요.
-        - 은행계좌(bank_account)는 은행명 + 계좌번호 형식으로 표기합니다.
-        - 계좌가 3개 이상일 경우, 대표 2개만 표기하고  
-        “나머지 계좌는 챗봇을 통해 문의해주세요.”라고 안내하세요.
-
-        4) 출력 형식
-        - 출력은 title을 제외한 **행동 설명 문장만** 반환합니다.
-        - 리스트, 헤더, 기호, JSON, 메타정보는 절대 사용하지 않습니다.
-        - 문장 사이에는 한 줄 공백 없이 바로 이어서 작성합니다.
-
-        [입력 정보]
-        제목(title): {title}
-        대상(who): {who}
-        언제(when): {when}
-        방법(how): {how}
-        담당 기관 또는 장소(where): {where}
-
-        위 규칙을 모두 지킨 행동 안내문을 자연스럽게 작성해 주세요.
-        """
+[요소 정보]
+- 대상: {who}
+- 시점/기한: {when}
+- 수행 방법: {how}
+- 기관/장소: {where}
+"""
 
         natural_text = call_llm(prompt).strip()
+        # natural_text가 여러 줄일 수 있으므로 줄 단위로 split
+        lines = natural_text.split("\n")
+
+        # 첫 번째 줄이 title과 완전히 동일하거나 공백 포함 동일하면 제거
+        if lines and lines[0].strip() == title.strip():
+            lines = lines[1:]  # 첫 줄 제거
+
+        # 다시 문장으로 합침
+        natural_text = "\n".join(lines).lstrip()
 
         results.append({
             "title": title,
