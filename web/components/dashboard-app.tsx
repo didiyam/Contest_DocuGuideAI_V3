@@ -90,9 +90,7 @@ export function DashboardApp() {
     }
   };
 
-  // ============================
   //   FastAPI /chat 호출 함수
-  // ============================
   async function sendChatToBackend(docId: string, message: string) {
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -110,9 +108,7 @@ export function DashboardApp() {
     return data;
   }
 
-  // ============================
   //   채팅 메세지 전송
-  // ============================
   const handleSendMessage = async (messageContent: string) => {
     if (!selectedFileId) return;
 
@@ -155,9 +151,7 @@ export function DashboardApp() {
     setIsTyping(false);
   };
 
-  // ============================
   //   파일 업로드 처리
-  // ============================
   const uploadFiles = async (incomingFiles: File[]) => {
     if (incomingFiles.length === 0) return;
 

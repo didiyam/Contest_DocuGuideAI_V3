@@ -17,16 +17,16 @@ export function WelcomeScreen({ onStartUpload }: WelcomeScreenProps) {
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
 
-  // 🟦 메인 버튼 → 업로드 시작
+  // 메인 버튼 → 업로드 시작
   const handleMainClick = () => {
     if (selectedFiles.length === 0) {
       setShowPicker((prev) => !prev)
     } else {
-      onStartUpload(selectedFiles) // 🔥 isUploading 체크 제거
+      onStartUpload(selectedFiles) // isUploading 체크 제거
     }
   }
 
-  // 🟦 파일 처리
+  // 파일 처리
   const handleFilePicked =
     (type: "pdf" | "image") => (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files || [])
@@ -53,7 +53,7 @@ export function WelcomeScreen({ onStartUpload }: WelcomeScreenProps) {
   const handlePdfClick = () => pdfInputRef.current?.click()
   const handleImageClick = () => imageInputRef.current?.click()
 
-  // 🟦 버튼 색상
+  // 버튼 색상
   const mainButtonLabel =
     selectedFiles.length === 0 ? "문서 업로드 시작하기" : "시작하기"
 

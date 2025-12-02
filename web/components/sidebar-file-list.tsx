@@ -49,7 +49,7 @@ export function SidebarFileList({
   className,
 }: SidebarFileListProps) {
 
-  // ⭐ 검색 입력값 & 검색 트리거값
+  // 검색 입력값 & 검색 트리거값
   const [searchText, setSearchText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
