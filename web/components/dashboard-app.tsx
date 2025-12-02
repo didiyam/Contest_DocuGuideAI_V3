@@ -31,7 +31,7 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
         <Sparkles className="w-12 h-12 text-cyan-400 animate-pulse" />
       </div>
       <h1 className="text-2xl font-bold text-cyan-100">똑디 Doc!</h1>
-      <p className="text-cyan-400/70 mt-2">Intelligent Document Analysis</p>
+      <p className="text-cyan-400/70 mt-2">당신의 똑똑한 디지털 문서 매니저</p>
     </div>
   );
 };

@@ -33,7 +33,7 @@ const steps = [
     icon: BarChart,
     label: "Summary",
     text: "Complete!",
-    textKo: "완료되었습니다!",
+    textKo: "분석이 완료되었습니다! 챗봇 생성 완료 후 바로 결과를 보여드릴게요 ",
   },
 ]
 

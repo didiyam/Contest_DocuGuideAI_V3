@@ -18,40 +18,56 @@ from src.ingestion.doc_parser import extract_pdf_text #, extract_ppt_text
 from src.utils.text_utils import preprocess_text
 from src.utils.file_utils import create_output_folder
 from src.utils.logger import log, user_log 
-from src.ingestion.llm_clean_data_pll import llm_text_from_images #,llm_clean_pii,
+from src.ingestion.llm_clean_data_pll import llm_text_from_images ,pdf_to_images,encode_image
 
+
+# 실제 텍스트 존재 여부 확인
+def has_real_text(pages: list[str]) -> bool:
+    for p in pages:
+        clean = p.replace("\n", "").replace("\r", "").strip()
+        if not clean:
+            continue
+
+        # 실제 문자(한글,영문,숫자)가 포함되어 있으면 텍스트가 있다고 판단
+        for ch in clean:
+            if ch.isalnum() or "\uac00" <= ch <= "\ud7a3":  # 한글 범위 체크
+                return True
+    return False
 
 # OCR 여부 확인 및 텍스트 추출
 def check_do_ocr(pdf_path: str, state: dict):
     """
     PDF 텍스트 레이어 없는 것 확인 후 OCR (클렌징+LLM 하기 전)
     """
-    log(f"[PDF 파서] 텍스트 레이어 추출 시도: {pdf_path}")
+    log(f"[OCR PDF] 텍스트 레이어 추출 시도: {pdf_path}")
     parsed_pages = extract_pdf_text(pdf_path)  # list[str]
 
     # PDF 텍스트 레이어가 있는 경우(list 중 하나라도 text 존재)
     all_text = "\n".join(parsed_pages).strip()
     if len(all_text) >= 10:
         log("[PDF 파서] 텍스트 레이어가 감지되어 OCR 생략")
-        state["raw_txt"] = parsed_pages  # state 저장
+        state["raw_txt"] = parsed_pages
         return parsed_pages
     
-
-
     # OCR 수행
-    log("[OCR] 텍스트 레이어 없음 → OCR 수행 시작")
-    user_log("문서에 텍스트 정보가 없어 이미지 기반 OCR을 진행합니다. 시간이 조금 걸릴 수 있어요 😊", step="ocr")
+    log("[OCR PDF] 텍스트 없음 → OCR 수행 시작")
 
-    #(이진아) 주석하기
-    ocr_pages = llm_text_from_images([pdf_path])
+    # 1) PDF → 이미지 변환
+    images = pdf_to_images(pdf_path)
+    log(f"[PDF OCR] PDF → 이미지 변환 완료 (총 {len(images)}페이지)")
 
+    # 2) OCR 실행(GPT Vision 사용)
+    
+    #(이진아) 주석하기(한 줄)
+    ocr_pages = llm_text_from_images(images)
+
+    log("[텍스트 없는 PDF OCR] Vision OCR 완료")
     #(이진아) 주석해제
     # images = pdf_to_images(pdf_path)
     # log(f"[OCR] PDF → 이미지 변환 완료 (총 {len(images)}페이지)")
     # ocr_pages = run_ocr(images)  # list[str]
     # log("[OCR] OCR 완료")
-
-    state["raw_txt"] = ocr_pages  
+    state["raw_txt"] = ocr_pages
     return ocr_pages
 
 
@@ -82,12 +98,13 @@ def node_ingestion_pipeline(state: dict) -> State:
 
     txt_pages: List[str] = []
 
-    # 2) 이미지 : 여러 장 PDF 통합 후 OCR 진행
+    # 2) 이미지 : GPT Vision OCR 처리
     if file_type == "image":
+        input_paths = [encode_image(p) for p in input_paths]
         #(이진아) 아래 두문장 주석처리
         txt_pages = llm_text_from_images(input_paths)
         state["raw_txt"] = txt_pages
-        #(이진아) 주석해제
+        #(이진아) 주석해제( 여러 장 PDF 통합 후 OCR 진행)
         # pdf_path = images_to_pdf(
         #     input_paths,
         #     os.path.join(output_dir, "images_to_pdf.pdf"),

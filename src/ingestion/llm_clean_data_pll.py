@@ -6,22 +6,57 @@ from src.utils.config import load_api_keys
 import os
 # os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE" # 위치변경 절대 금지
 import fitz
-# from src.utils.api_client import client
+import fitz
+doc = fitz.open("./input/testcase/[TEST]이미지.pdf")
+print("PDF 페이지 개수:", doc.page_count)
+
+# 메모리 기반 (로컬 저장 없음)
 def pdf_to_images(pdf_path: str, dpi: int = 350) -> list[str]:
+    """
+    PDF -> 이미지 변환
+    디스크에 파일 저장 없이 base64 PNG 문자열 리스트로 반환
+    """
+    import base64
+    import os
+    import fitz
+
     doc = fitz.open(pdf_path)
-    image_paths = []
-    base = os.path.dirname(pdf_path)
+    image_b64_list = []
+
+    # DPI → zoom matrix 변환
+    zoom = dpi / 72
+    mat = fitz.Matrix(zoom, zoom)
 
     try:
-        for i, page in enumerate(doc):
-            pix = page.get_pixmap(dpi=dpi)
-            img_path = os.path.join(base, f"page_{i+1}.png")
-            pix.save(img_path)
-            image_paths.append(img_path)
+        for page in doc:
+            pix = page.get_pixmap(matrix=mat)
+
+            img_bytes = pix.tobytes("png")  # 메모리에서 PNG bytes 생성
+            img_b64 = base64.b64encode(img_bytes).decode("utf-8")  # 문자열로 변환
+
+            image_b64_list.append(img_b64)
+
     finally:
         doc.close()
 
-    return image_paths
+    return image_b64_list
+
+# # from src.utils.api_client import client
+# def pdf_to_images(pdf_path: str, dpi: int = 350) -> list[str]:
+#     doc = fitz.open(pdf_path)
+#     image_paths = []
+#     base = os.path.dirname(pdf_path)
+
+#     try:
+#         for i, page in enumerate(doc):
+#             pix = page.get_pixmap(dpi=dpi)
+#             img_path = os.path.join(base, f"page_{i+1}.png")
+#             pix.save(img_path)
+#             image_paths.append(img_path)
+#     finally:
+#         doc.close()
+#     return image_paths
+
 # 텍스트 llm 정제
 API_KEY = load_api_keys()
 client = OpenAI(api_key=API_KEY)
@@ -100,14 +135,10 @@ def encode_image(path: str) -> str:
 
 
 # GPT Vision 1페이지 처리 함수
-def extract_page_text(image_path: str) -> str:
+def extract_page_text(image_b64: str) -> str:
     """
-    GPT-Vision 기반 OCR + PII 마스킹을
-    llm_clean_pii 수준으로 실행하는 고성능 버전
+    GPT-Vision 기반 OCR (base64 PNG 입력)
     """
-
-    image_b64 = encode_image(image_path)
-
     vision_prompt = PROMPT
 
     response = client.chat.completions.create(
@@ -123,7 +154,9 @@ def extract_page_text(image_path: str) -> str:
                     {"type": "text", "text": vision_prompt},
                     {
                         "type": "image_url",
-                        "image_url": {"url": f"data:image/png;base64,{image_b64}"}
+                        "image_url": {
+                            "url": f"data:image/png;base64,{image_b64}"
+                        }
                     }
                 ]
             }
@@ -136,18 +169,18 @@ def extract_page_text(image_path: str) -> str:
 
 
 # 전체 페이지 Vision 처리
-def llm_text_from_images(image_paths: list[str]) -> list[str]:
+def llm_text_from_images(image_b64_list: list[str]) -> list[str]:
     """
-    이미지를 GPT-4o Vision에 넣고 페이지별 텍스트를 정제하여 반환하는 함수
+    base64 PNG 문자열 리스트를 받아 Vision OCR 수행 후 텍스트 정제
     """
     final_pages = []
-    log(f"[Vision] 총 {len(image_paths)} 페이지 인식 시작")
+    log(f"[Vision] 총 {len(image_b64_list)} 페이지 인식 시작")
 
-    for idx, img in enumerate(image_paths):
-        log(f"[Vision] 페이지 {idx+1}/{len(image_paths)} 처리 중: {img}")
+    for idx, img_b64 in enumerate(image_b64_list):
+        log(f"[Vision] 페이지 {idx+1}/{len(image_b64_list)} 처리 중")
 
         try:
-            refined = extract_page_text(img)
+            refined = extract_page_text(img_b64)
         except Exception as e:
             log(f"[Vision ERROR] {idx+1}페이지 오류: {e}", level="error")
             refined = ""
@@ -156,3 +189,4 @@ def llm_text_from_images(image_paths: list[str]) -> list[str]:
 
     log(f"[Vision] 전체 {len(final_pages)} 페이지 Vision OCR 완료")
     return final_pages
+
