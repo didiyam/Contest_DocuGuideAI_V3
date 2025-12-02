@@ -30,7 +30,7 @@ export default function UploadModal({
         setSelectedFiles(files)
     }
 
-    // ❗ 시작하기 버튼: 모달 먼저 닫고 DashboardApp에서 로딩 제어
+    // 시작하기 버튼: 모달 먼저 닫고 DashboardApp에서 로딩 제어
     const handleStart = () => {
         if (selectedFiles.length === 0) return
         onClose()
@@ -95,7 +95,7 @@ export default function UploadModal({
                     </div>
                 )}
 
-                {/* 🔵 선택된 파일 목록 */}
+                {/* 선택된 파일 목록 */}
                 {selectedFiles.length > 0 && (
                     <div className="mb-4 bg-slate-900 p-3 rounded-lg border border-cyan-500/20">
 

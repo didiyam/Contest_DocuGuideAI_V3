@@ -74,8 +74,20 @@ import numpy as np
 
 # 문장 분리
 def split_sentences(text: str):
-    sentences = re.split(r'(?<=[.!?…\n])\s+', text)
-    return [s.strip() for s in sentences if len(s.strip()) > 5]
+    # 날짜 패턴 보호 (마침표로 쪼개지지 않게)
+    safe_text = re.sub(r'(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})', r'\1-\2-\3', text)
+
+    # 문장 단위 분리
+    sentences = re.split(r'(?<=[.!?…\n])\s+', safe_text)
+
+    # 공백 제거 + 너무 짧은 문장 제거
+    sentences = [s.strip() for s in sentences if len(s.strip()) > 5]
+
+    # 출력 시 날짜 표기 복원
+    sentences = [re.sub(r'(\d{4})-(\d{1,2})-(\d{1,2})', r'\1.\2.\3', s) for s in sentences]
+
+    return sentences
+
 
 
 # 코사인 유사도

@@ -6,9 +6,7 @@ from src.utils.config import load_api_keys
 import os
 # os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE" # 위치변경 절대 금지
 import fitz
-import fitz
-doc = fitz.open("./input/testcase/[TEST]이미지.pdf")
-print("PDF 페이지 개수:", doc.page_count)
+
 
 # 메모리 기반 (로컬 저장 없음)
 def pdf_to_images(pdf_path: str, dpi: int = 350) -> list[str]:

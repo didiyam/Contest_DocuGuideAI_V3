@@ -31,7 +31,6 @@ export function FileSidebar({ children, className }: FileSidebarProps) {
     const sidebarLeft = sidebarRef.current.getBoundingClientRect().left
     const newWidth = e.clientX - sidebarLeft
 
-    // 최소 / 최대 폭 제한
     const min = 200
     const max = 520
 
@@ -67,9 +66,11 @@ export function FileSidebar({ children, className }: FileSidebarProps) {
       {/* 드래그 핸들 */}
       <div
         onMouseDown={startResize}
-        className="absolute top-0 right-0 h-full w-1 cursor-ew-resize 
-                   hover:bg-cyan-500/40 active:bg-cyan-400/70 
-                   transition z-20"
+        className="
+          absolute top-0 right-0 h-full w-1 cursor-ew-resize 
+          hover:bg-cyan-500/40 active:bg-cyan-400/70 
+          transition z-20
+        "
       />
     </div>
   )

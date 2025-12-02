@@ -90,9 +90,7 @@ export function DashboardApp() {
     }
   };
 
-  // ============================
   //   FastAPI /chat 호출 함수
-  // ============================
   async function sendChatToBackend(docId: string, message: string) {
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -110,9 +108,7 @@ export function DashboardApp() {
     return data;
   }
 
-  // ============================
   //   채팅 메세지 전송
-  // ============================
   const handleSendMessage = async (messageContent: string) => {
     if (!selectedFileId) return;
 
@@ -155,9 +151,7 @@ export function DashboardApp() {
     setIsTyping(false);
   };
 
-  // ============================
   //   파일 업로드 처리
-  // ============================
   const uploadFiles = async (incomingFiles: File[]) => {
     if (incomingFiles.length === 0) return;
 
@@ -281,7 +275,7 @@ export function DashboardApp() {
           isUploading={isUploading}
         />
       ) : (
-        <div className="h-screen w-full bg-slate-950 text-slate-200 overflow-hidden flex flex-col">
+          <div className="min-h-screen w-full bg-slate-950 text-slate-200 flex flex-col overflow-y-auto">
           <UploadModal
             isOpen={uploadModalOpen}
             onClose={() => setUploadModalOpen(false)}
@@ -302,44 +296,47 @@ export function DashboardApp() {
               />
             ) : (
               <div className="flex-1 flex flex-col">
-                <div className="h-14 border-b border-cyan-500/30 flex items-center px-4 bg-slate-900/80 backdrop-blur-lg">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleBackToList}
-                  >
-                    <ArrowLeft className="h-5 w-5 text-cyan-400" />
-                  </Button>
-                  <span className="flex-1 font-semibold">
-                    {selectedFile?.name}
-                  </span>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-5 w-5 text-cyan-400" />
-                  </Button>
-                </div>
+                    <div className="h-14 border-b border-cyan-500/30 flex items-center px-4 bg-slate-900/80 backdrop-blur-lg sticky top-0 z-50">
+                  <Button variant="ghost" size="icon" onClick={handleBackToList}>
+                      <ArrowLeft className="h-5 w-5 text-cyan-400" />
+                    </Button>
+
+                    <span className="flex-1 font-semibold truncate">
+                      {selectedFile?.name}
+                    </span>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsMobileChatOpen(true)}
+                    >
+                      <MessageSquare className="h-5 w-5 text-cyan-400" />
+                    </Button>
+                  </div>
 
                 <div className="flex-1 overflow-y-auto">
                   {selectedFile && <AnalysisPanel file={selectedFile} />}
                 </div>
 
-                <div className="absolute bottom-6 right-6">
-                  <Button
-                    size="lg"
-                    className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 shadow-xl"
-                    onClick={() => setIsMobileChatOpen(true)}
-                  >
-                    <MessageSquare className="text-white" />
-                  </Button>
-                </div>
+                  <div className="fixed bottom-6 right-6 z-50">
+                    <Button
+                      size="lg"
+                      className="h-14 w-14 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 shadow-xl"
+                      onClick={() => setIsMobileChatOpen(true)}
+                    >
+                      <MessageSquare className="text-white" />
+                    </Button>
+                  </div>
 
                 <Sheet
                   open={isMobileChatOpen}
                   onOpenChange={setIsMobileChatOpen}
                 >
-                  <SheetContent
-                    side="bottom"
-                    className="h-[85vh] p-0 rounded-t-2xl"
-                  >
+                    <SheetContent
+                      side="bottom"
+                      className="h-screen p-0 rounded-t-2xl"
+                    >
+
                     <ChatInterface
                       file={selectedFile}
                       messages={
