@@ -7,9 +7,7 @@ from openai import OpenAI
 from src.utils.config import load_api_keys
 
 
-# -------------------------------
 # 1) call_llm 강제 JSON-only 버전
-# -------------------------------
 def call_llm_json(prompt: str) -> str:
     API_KEY = load_api_keys()
     client = OpenAI(api_key=API_KEY)
@@ -34,7 +32,7 @@ def call_llm_json(prompt: str) -> str:
     return text
 
 
-# JSON 자동 복구 -------------------------------
+# JSON 자동 복구 
 def repair_json(text: str) -> str:
     # 코드블록 제거
     text = re.sub(r"```.*?```", "", text, flags=re.S)
@@ -126,9 +124,7 @@ def node_action_extractor(state: Dict[str, Any]) -> Dict[str, Any]:
 
     raw = call_llm_json(action_prompt)
 
-    # ----------------------------------
     # 2) JSON 자동 복구 + 파싱
-    # ----------------------------------
     try:
         parsed = json.loads(raw)
     except Exception:
@@ -142,9 +138,7 @@ def node_action_extractor(state: Dict[str, Any]) -> Dict[str, Any]:
             print("[문제 발생] JSON 복구 실패 -> fallback 반환")
             parsed = {"needs_action": True, "action_info": []}
 
-    # ----------------------------------
     # 3) state 업데이트
-    # ----------------------------------
     state["needs_action"] = parsed.get("needs_action", True)
     state["action_info"] = parsed.get("action_info", [])
 

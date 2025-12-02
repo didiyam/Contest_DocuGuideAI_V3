@@ -27,7 +27,7 @@ def split_sents(t: str) -> List[str]:
         if sent: merged.append(sent)
     if len(parts) % 2 == 1 and parts[-1].strip():
         merged.append(parts[-1].strip())
-    return [s for s in merged if s]
+    return [s for s in merged if s] 
 
 def create_output_folder():
     """

@@ -30,7 +30,7 @@ class State(TypedDict, total=False):
     ner_result : Dict           #행정정보json
     ner_result_raw : str        #LLM 원문
     ner_error : str             #ner 추출시 발생한 에러
-
+ 
     #[서영 파트]
     #node_action_extractor
     needs_action: Any           #행동지시 여부 확인

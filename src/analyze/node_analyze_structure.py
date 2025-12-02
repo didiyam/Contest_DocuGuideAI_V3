@@ -33,7 +33,7 @@ def node_analyze_structure(state: Dict[str, Any]) -> Dict[str, Any]:
     texts = state.get("texts", [])
     doc_type = state.get("doc_type")  # ← 다른 노드에서 미리 세팅 (여기서는 추론 X)
 
-    # --- 1. texts → 사람이 읽을 수 있는 큰 문자열로 병합 ---
+    # 1. texts → 사람이 읽을 수 있는 큰 문자열로 병합 
     page_texts: List[str] = []
 
     # texts 형태 허용:
@@ -64,7 +64,7 @@ def node_analyze_structure(state: Dict[str, Any]) -> Dict[str, Any]:
         state["structure_summary"] = "문서에서 유의미한 텍스트를 찾지 못했습니다."
         return state
 
-    # --- 2. LLM 프롬프트 구성 ---
+    # 2. LLM 프롬프트 구성 
     system_msg = """
 당신은 공공문서를 분석하는 문서 구조 전문가입니다.
 
@@ -110,7 +110,7 @@ def node_analyze_structure(state: Dict[str, Any]) -> Dict[str, Any]:
    - (예: 붙임/부록 구성, 자주 나오는 패턴, 구조적으로 주의 깊게 봐야 할 부분 등)
 """
 
-    # --- 3. LLM 호출 ---
+    # 3. LLM 호출 
     response = client.responses.create(
         model="gpt-4o-mini",  # 프로젝트에서 사용하는 기본 모델로 교체 가능
         input=[

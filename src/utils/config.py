@@ -19,7 +19,7 @@ def load_api_keys():
     return api_key
 
 #  AI Model Settings
-
+ 
 # # LLM 모델 이름
 LLM_MODEL = "gpt-4o-mini"
 

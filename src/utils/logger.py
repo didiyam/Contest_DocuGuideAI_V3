@@ -10,10 +10,9 @@ from typing import List, Dict
 BASE_LOG_DIR = "../logs"
 
 # 메모리에 사용자 안내 메시지 저장용 버퍼
-#   - 나중에 웹에서 최근 안내 메시지를 가져갈 때 사용 가능
 _USER_LOG_BUFFER: List[Dict] = []
 
-
+ 
 def init_logger(work_dir: str | None = None) -> logging.Logger:
     """
     work_dir가 지정되면 해당 폴더에도 로그 파일 생성

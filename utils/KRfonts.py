@@ -15,4 +15,4 @@ rcParams['axes.unicode_minus'] = False  # 마이너스 깨짐 방지
 # plt.plot([1, 2, 3])
 # plt.title("테스트")
 # plt.show() 
-# print("완료")
+# print("완료") 

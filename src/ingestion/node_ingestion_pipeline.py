@@ -48,7 +48,7 @@ def check_do_ocr(pdf_path: str, state: dict):
         log("[PDF 파서] 텍스트 레이어가 감지되어 OCR 생략")
         state["raw_txt"] = parsed_pages
         return parsed_pages
-    
+     
     # OCR 수행
     log("[OCR PDF] 텍스트 없음 → OCR 수행 시작")
 

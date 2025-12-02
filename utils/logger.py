@@ -100,7 +100,7 @@ def user_log(message: str, step: str | None = None):
             "message": message,
         }
     )
-
+ 
 
 def get_user_logs(clear: bool = False) -> List[Dict]:
     """

@@ -26,7 +26,7 @@ class State(TypedDict, total=False):
     # 3. 텍스트 추출 결과 (페이지 단위 / 정제 단계별)
     # ingestion 단계에서 추출/클렌징한 텍스트
     raw_txt: List[str]        # OCR/텍스트 레이어 등에서 바로 뽑은 원본 페이지 텍스트
-    refined_txt: List[str]    # preprocess_text + llm_clean_pii 적용 후의 페이지 텍스트
+    refined_txt: List[str]    # preprocess_text  + llm_clean_pii 적용 후의 페이지 텍스트
 
     # pdf_test + node_preprocess에서 사용하는 이름
     raw_texts: List[str]      # 테스트용 pdf_text_test가 채우는 페이지 텍스트

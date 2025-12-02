@@ -13,7 +13,7 @@ import uuid
 
 from src.utils.config import WORK_DIR
 
-
+ 
 
 """* 공백 제거 함수"""
 def clean_text(s):

@@ -60,7 +60,6 @@ def call_llm(prompt: str) -> str:
     
 
 
-# -------------------------
 # 요약 함수
 def _summarizer(text: str) -> str:
     prompt = f"""
@@ -81,7 +80,6 @@ def _summarizer(text: str) -> str:
     return call_llm(prompt)
 
 # 행동 추출 및 요약 패키저
-# -------------------------
 def node_result_packager(state: Dict[str, Any]) -> Dict[str, Any]:
     print("\n[Node] node_result_packager 실행")
     state = copy.deepcopy(state)
@@ -114,7 +112,6 @@ def node_result_packager(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # 행동지시 자연어 안내 변환
-# -------------------------
 def format_action_instructions(action_list):
     """
     행동지시(action_info)를 부드러운 자연어로 재작성하고
