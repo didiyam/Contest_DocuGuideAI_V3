@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import type { DocumentFile } from "./sidebar-file-list"
+import { motion, AnimatePresence } from "framer-motion"
+
 
 export interface ChatMessage {
   id: string
@@ -18,15 +20,16 @@ export interface ChatMessage {
   source?: string
 }
 
-/** **텍스트** 부분을 <strong>으로 바꿔서 렌더하는 헬퍼 */
+
+//텍스트 부분을 <strong>으로 바꿔서 렌더링
 function renderMessageContent(content: string) {
-  // **굵게** 부분을 기준으로 잘라서 JSX로 변환
+  // 굵게 부분을 기준으로 잘라서 JSX로 변환
   const segments = content.split(/(\*\*[^*]+\*\*)/g)
 
   return segments.map((seg, i) => {
     const boldMatch = seg.match(/^\*\*(.*)\*\*$/)
     if (boldMatch) {
-      // **안쪽 텍스트만 굵게
+      // 안쪽 텍스트만 굵게
       return (
         <strong key={i} className="font-semibold">
           {boldMatch[1]}
@@ -58,6 +61,27 @@ export function ChatInterface({
   const chatScrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [openSourceId, setOpenSourceId] = useState<string | null>(null)
+
+  const [typingText, setTypingText] = useState("");
+
+  // 타이핑 애니메이션 효과
+  useEffect(() => {
+    if (!isTyping) {
+      setTypingText("")
+      return
+    }
+
+    const fullText = `${file?.name} 문서 기준 답변 생성 중...`
+    let index = 0
+
+    const interval = setInterval(() => {
+      index++
+      setTypingText(fullText.slice(0, index))
+      if (index >= fullText.length) clearInterval(interval)
+    }, 30) // 타이핑 속도
+
+    return () => clearInterval(interval)
+  }, [isTyping, file?.name])
 
 
   // Auto-scroll to bottom when messages change
@@ -149,7 +173,7 @@ export function ChatInterface({
                 {/* 본문 텍스트 */}
                 {renderMessageContent(msg.content)}
 
-                {/* ⭐ 문서출처 버튼 + 토글영역 */}
+                {/* 문서출처 버튼 + 토글영역 */}
                 {msg.role === "assistant" && msg.source && (
                   <div className="mt-2 text-xs text-cyan-300">
                     <button
@@ -183,15 +207,22 @@ export function ChatInterface({
                 <Bot className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <div className="p-3 rounded-2xl rounded-tl-none bg-slate-800 text-gray-200 border border-slate-700 flex items-center gap-2">
-              <span className="animate-pulse">...</span>
-              <span className="text-xs text-cyan-400/70">{file.name} 문서 기준 답변 생성 중</span>
+
+            <div className="p-3 rounded-2xl rounded-tl-none bg-slate-800 text-gray-200 border border-slate-700">
+              <motion.span
+                key={typingText}
+                initial={{ opacity: 0.4 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+                className="text-xs text-cyan-400/90 whitespace-pre-line"
+              >
+                {typingText}
+              </motion.span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Input Area */}
       {/* Input Area */}
       <div className="p-4 border-t border-cyan-500/30 bg-slate-900/80 backdrop-blur-md sticky bottom-0">
         <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
