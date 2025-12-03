@@ -49,7 +49,7 @@ export default function LoadingOverlay({ fileName, visible, docId }: LoadingOver
 
     const interval = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % steps.length);
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [visible]);
