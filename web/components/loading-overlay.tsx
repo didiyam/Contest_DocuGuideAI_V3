@@ -15,19 +15,19 @@ const steps = [
     label: "Reading",
     text: "Reading text...",
     textKo:
-      "똑디 DOC는 약 1분 동안 복잡한 공공문서를 분석해요. \n 텍스트로 된 pdf는 결과가 더 빨리나와요.",
+      "똑디 DOC이 약 1분 동안 복잡한 공공문서를 분석하고 있어요. \n 텍스트로 된 pdf는 결과가 더 빨리나와요.",
   },
   {
     label: "Understanding",
     text: "Organizing info...",
     textKo:
-      "문서 속 '해야 할 행동'을 스스로 찾아드려요. \n 이제 문서를 읽고 고민할 필요가 없어요. 바로 행동하세요!",
+      "문서 속 '해야 할 행동'을 찾아드려요. \n 이제 문서를 읽고 고민할 필요가 없어요. 바로 행동하세요!",
   },
   {
     label: "Preparing Bot",
     text: "Building chatbot...",
     textKo:
-      "복잡한 문서에서 궁금한 점이 있으시죠? \n 똑디봇에게 문서에 대한 모든 정보를 물어볼 수 있어요.",
+      "똑디 DOC은 '똑'똑한 '디'지털 'DOC'(문서) 매니저라는 뜻이에요! \n 문서에 대한 모든 정보를 물어볼 수 있어요.",
   },
   {
     label: "Getting Ready",
