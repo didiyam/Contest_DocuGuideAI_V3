@@ -2,6 +2,8 @@
 # 똑띠DOC
 **똑**똑한 **디**지털 **DOC** AI매니저
 
+<img width="3836" height="1802" alt="image" src="https://github.com/user-attachments/assets/a460bc94-1969-4b9c-975a-f3ef9b00ffd2" />
+<img width="3037" height="1799" alt="image" src="https://github.com/user-attachments/assets/11a54436-34a1-4f1d-8637-b41a7e2c84de" />
 
 복잡한 공공문서를 업로드하면 AI가 쉽게 설명해주고, 행동지침와 Q&A까지 지원하는 맞춤형 AI Agent 프로젝트입니다.
 
